@@ -34,6 +34,12 @@ describe OStruct::Sanitizer do
       expect(user.last_name.length).to be 10
       expect(user.last_name).to eq "last name "
     end
+
+    it "does not sanitize if value is nil" do
+      user = User.new first_name: nil, last_name: nil
+      expect(user.first_name).to be nil
+      expect(user.last_name).to be nil
+    end
   end
 
   describe "#drop_punctuation" do
@@ -51,6 +57,12 @@ describe OStruct::Sanitizer do
     it "drops punctuation from user's country name" do
       expect(user.country).to eq "Brazil"
     end
+
+    it "does not sanitize if value is nil" do
+      user = User.new city: nil, country: nil
+      expect(user.city).to be nil
+      expect(user.country).to be nil
+    end
   end
 
   describe "#strip" do
@@ -67,6 +79,12 @@ describe OStruct::Sanitizer do
 
     it "strips out leading and trailing spaces from user's phone number" do
       expect(user.phone).to eq "(55) 51 00000000"
+    end
+
+    it "does not sanitize if value is nil" do
+      user = User.new email: nil, phone: nil
+      expect(user.email).to be nil
+      expect(user.phone).to be nil
     end
   end
 end
