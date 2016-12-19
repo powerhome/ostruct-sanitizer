@@ -1,8 +1,8 @@
 # OStruct::Sanitizer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ostruct/sanitizer`. To experiment with that code, run `bin/console` for an interactive prompt.
+Provides Rails-like sanitization hooks to be applied to OpenStruct fields upon their assignment, allowing for better encapsulation of such rules and simple extensibility.
 
-TODO: Delete this and the text above, and describe your gem
+This module provides a few built-in sanitization rules, all built upon the basic `#sanitize` method used as building block.
 
 ## Installation
 
@@ -22,7 +22,25 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+More complex sanitization rules may be created using the `#sanitize` method.
+
+```ruby
+require "ostruct"
+require "ostruct/sanitizer"
+
+class User < OpenStruct
+  include OStruct::Sanitizer
+
+  truncate :first_name, :last_name, length: 10
+  drop_punctuation :city, :country
+  strip :email, :phone
+
+  sanitize :age do |value|
+    # Apply more complex sanitization rule to the value of "age" returning the
+    # final, sanitized value.
+  end
+end
+```
 
 ## Development
 
