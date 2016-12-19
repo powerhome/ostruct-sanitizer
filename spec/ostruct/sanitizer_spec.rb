@@ -5,6 +5,18 @@ describe OStruct::Sanitizer do
     expect(OStruct::Sanitizer::VERSION).not_to be nil
   end
 
+  describe "invalid usage" do
+    it "fails including OStruct::Sanitizer within a non OpenStruct class" do
+      define_invalid_usage = -> {
+        class InvalidUsage
+          include OStruct::Sanitizer
+        end
+      }
+
+      expect(define_invalid_usage).to raise_error
+    end
+  end
+
   describe "#truncate" do
     let(:user) do
       User.new(
