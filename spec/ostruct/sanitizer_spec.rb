@@ -87,4 +87,27 @@ describe OStruct::Sanitizer do
       expect(user.phone).to be nil
     end
   end
+
+  describe "#digits" do
+    let(:user) do
+      User.new(
+        ssn: "111-11-1111",
+        cell_phone: "+1-541-000-0000",
+      )
+    end
+
+    it "keeps only digits from ssn field" do
+      expect(user.ssn).to eq "111111111"
+    end
+
+    it "keeps only digits from cell_phone field" do
+      expect(user.cell_phone).to eq "15410000000"
+    end
+
+    it "does not sanitize if value is nil" do
+      user = User.new ssn: nil, cell_phone: nil
+      expect(user.ssn).to be nil
+      expect(user.cell_phone).to be nil
+    end
+  end
 end
