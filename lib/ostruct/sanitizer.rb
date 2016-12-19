@@ -90,6 +90,16 @@ module OStruct
           sanitize(field) { |value| value[0...length] }
         end
       end
+
+      # Drops any punctuation character from the field's value
+      #
+      # @param [Array<Symbol>] a list of field names to be sanitized
+      #
+      def drop_punctuation(*fields)
+        fields.each do |field|
+          sanitize(field) { |value| value.gsub(/[^\w\s]/, '') }
+        end
+      end
     end
   end
 end

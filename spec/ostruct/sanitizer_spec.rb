@@ -23,4 +23,21 @@ describe OStruct::Sanitizer do
       expect(user.last_name).to eq "last name "
     end
   end
+
+  describe "#drop_punctuation" do
+    let(:user) do
+      User.new(
+        city: "Porto, Alegre!",
+        country: "B.r!a,z#i%l^",
+      )
+    end
+
+    it "drops punctuation from user's city name" do
+      expect(user.city).to eq "Porto Alegre"
+    end
+
+    it "drops punctuation from user's country name" do
+      expect(user.country).to eq "Brazil"
+    end
+  end
 end
