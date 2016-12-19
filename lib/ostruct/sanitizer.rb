@@ -100,6 +100,16 @@ module OStruct
           sanitize(field) { |value| value.gsub(/[^\w\s]/, '') }
         end
       end
+
+      # Strips out leading and trailing spaces from the values of the given fields
+      #
+      # @param [Array<Symbol>] fields list of fields to be sanitized
+      #
+      def strip(*fields)
+        fields.each do |field|
+          sanitize(field) { |value| value.strip }
+        end
+      end
     end
   end
 end

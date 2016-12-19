@@ -40,4 +40,21 @@ describe OStruct::Sanitizer do
       expect(user.country).to eq "Brazil"
     end
   end
+
+  describe "#strip" do
+    let(:user) do
+      User.new(
+        email: "  drborges.cic@gmail.com   ",
+        phone: "  (55) 51 00000000    ",
+      )
+    end
+
+    it "strips out leading and trailing spaces from user's email" do
+      expect(user.email).to eq "drborges.cic@gmail.com"
+    end
+
+    it "strips out leading and trailing spaces from user's phone number" do
+      expect(user.phone).to eq "(55) 51 00000000"
+    end
+  end
 end
