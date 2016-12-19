@@ -110,6 +110,16 @@ module OStruct
           sanitize(field) { |value| value.strip }
         end
       end
+
+      # Removes any non-digit character from the values of the given fields
+      #
+      # @param [Array<Symbol>] fields list of fields to be sanitized
+      #
+      def digits(*fields)
+        fields.each do |field|
+          sanitize(field) { |value| value.to_s.gsub(/[^0-9]/, '') }
+        end
+      end
     end
   end
 end

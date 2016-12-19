@@ -7,4 +7,5 @@ class User < OpenStruct
   truncate :first_name, :last_name, length: 10
   drop_punctuation :city, :country
   strip :email, :phone
+  digits :ssn, :cell_phone
 end
