@@ -13,7 +13,7 @@ describe OStruct::Sanitizer do
         end
       }
 
-      expect(define_invalid_usage).to raise_error
+      expect(define_invalid_usage).to raise_error "#{OStruct::Sanitizer.name} can only be used within OpenStruct classes"
     end
   end
 
