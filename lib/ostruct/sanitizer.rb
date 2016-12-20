@@ -53,7 +53,7 @@ module OStruct
     private
 
     def sanitize(field, value)
-      return value if value.nil? || !sanitize?(field)
+      return value unless sanitize? field
       self.class.sanitizers[field].reduce(value) do |current_value, sanitizer|
         sanitizer.call(current_value)
       end
@@ -90,7 +90,7 @@ module OStruct
       #
       def truncate(*fields, length:, strip_whitespaces: true)
         strip(*fields) if strip_whitespaces
-        sanitize(*fields) { |value| value[0...length] }
+        sanitize(*fields) { |value| value.nil? ? value : value[0...length] }
         strip(*fields) if strip_whitespaces
       end
 
@@ -99,7 +99,7 @@ module OStruct
       # @param [Array<Symbol>] a list of field names to be sanitized
       #
       def drop_punctuation(*fields)
-        sanitize(*fields) { |value| value.gsub(/[^\w\s]/, '') }
+        sanitize(*fields) { |value| value.nil? ? value : value.gsub(/[^\w\s]/, '') }
       end
 
       # Strips out leading and trailing spaces from the values of the given fields
@@ -107,7 +107,7 @@ module OStruct
       # @param [Array<Symbol>] fields list of fields to be sanitized
       #
       def strip(*fields)
-        sanitize(*fields) { |value| value.strip }
+        sanitize(*fields) { |value| value.nil? ? value : value.strip }
       end
 
       # Removes any non-digit character from the values of the given fields
@@ -115,7 +115,16 @@ module OStruct
       # @param [Array<Symbol>] fields list of fields to be sanitized
       #
       def digits(*fields)
-        sanitize(*fields) { |value| value.to_s.gsub(/[^0-9]/, '') }
+        sanitize(*fields) { |value| value.nil? ? value : value.to_s.gsub(/[^0-9]/, '') }
+      end
+
+      # Handles nil values as a given default
+      #
+      # @param [Array<Symbol>] fields list of fields to be sanitized
+      # @param [Any] to the default value to use when current value is nil
+      #
+      def default(*fields, to:)
+        sanitize(*fields) { |value| value.nil? ? to : value }
       end
     end
   end

@@ -113,4 +113,29 @@ describe OStruct::Sanitizer do
       expect(user.cell_phone).to be nil
     end
   end
+
+  describe "#default" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      default :active, to: true
+    end
+
+    context "with default value" do
+
+      context "user.active is nil" do
+        let(:user) { User.new active: nil }
+        it { expect(user.active).to be true }
+      end
+
+      context "active user" do
+        let(:user) { User.new active: true }
+        it { expect(user.active).to be true }
+      end
+
+      context "inactive user" do
+        let(:user) { User.new active: false }
+        it { expect(user.active).to be false }
+      end
+    end
+  end
 end
