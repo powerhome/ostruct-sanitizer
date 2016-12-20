@@ -84,10 +84,12 @@ module OStruct
       #
       # @param [Array<Symbol>] a list of field names to be sanitized
       # @param [Integer] length the amount to truncate the field's value to
+      # @param [Boolean] strip_whitespaces whether or not to strip whitespaces
       #
-      def truncate(*fields, length:)
+      def truncate(*fields, length:, strip_whitespaces: true)
         fields.each do |field|
           sanitize(field) { |value| value[0...length] }
+          strip(field) if strip_whitespaces
         end
       end
 
