@@ -71,13 +71,15 @@ module OStruct
 
       # Registers a sanitization block for a given field
       #
-      # @param [Symbol] field the field to be sanitized
-      # @param [#call] block sanitization block that takes the current value and returns the new sanitized value
+      # @param [Array<Symbol>] a list of field names to be sanitized
+      # @param [#call] block sanitization block to be applied to the current value of each field and returns the new sanitized value
       #
-      def sanitize(field, &block)
+      def sanitize(*fields, &block)
         @sanitizers ||= {}
-        field_sanitizers = @sanitizers[field] ||= []
-        field_sanitizers << block
+        fields.each do |field|
+          field_sanitizers = @sanitizers[field] ||= []
+          field_sanitizers << block
+        end
       end
 
       # Truncates fields to a given length value
@@ -87,10 +89,8 @@ module OStruct
       # @param [Boolean] strip_whitespaces whether or not to strip whitespaces
       #
       def truncate(*fields, length:, strip_whitespaces: true)
-        fields.each do |field|
-          sanitize(field) { |value| value[0...length] }
-          strip(field) if strip_whitespaces
-        end
+        sanitize(*fields) { |value| value[0...length] }
+        strip(*fields) if strip_whitespaces
       end
 
       # Drops any punctuation character from the field's value
@@ -98,9 +98,7 @@ module OStruct
       # @param [Array<Symbol>] a list of field names to be sanitized
       #
       def drop_punctuation(*fields)
-        fields.each do |field|
-          sanitize(field) { |value| value.gsub(/[^\w\s]/, '') }
-        end
+        sanitize(*fields) { |value| value.gsub(/[^\w\s]/, '') }
       end
 
       # Strips out leading and trailing spaces from the values of the given fields
@@ -108,9 +106,7 @@ module OStruct
       # @param [Array<Symbol>] fields list of fields to be sanitized
       #
       def strip(*fields)
-        fields.each do |field|
-          sanitize(field) { |value| value.strip }
-        end
+        sanitize(*fields) { |value| value.strip }
       end
 
       # Removes any non-digit character from the values of the given fields
@@ -118,9 +114,7 @@ module OStruct
       # @param [Array<Symbol>] fields list of fields to be sanitized
       #
       def digits(*fields)
-        fields.each do |field|
-          sanitize(field) { |value| value.to_s.gsub(/[^0-9]/, '') }
-        end
+        sanitize(*fields) { |value| value.to_s.gsub(/[^0-9]/, '') }
       end
     end
   end
