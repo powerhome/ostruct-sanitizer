@@ -89,6 +89,7 @@ module OStruct
       # @param [Boolean] strip_whitespaces whether or not to strip whitespaces
       #
       def truncate(*fields, length:, strip_whitespaces: true)
+        strip(*fields) if strip_whitespaces
         sanitize(*fields) { |value| value[0...length] }
         strip(*fields) if strip_whitespaces
       end
