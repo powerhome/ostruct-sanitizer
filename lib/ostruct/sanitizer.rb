@@ -19,7 +19,7 @@ module OStruct
   module Sanitizer
     def self.included(base)
       unless base.ancestors.include? OpenStruct
-        raise "OpenStructSanitizer can only be used within OpenStruct classes."
+        raise "#{self.name} can only be used within OpenStruct classes"
       end
 
       base.extend ClassMethods
