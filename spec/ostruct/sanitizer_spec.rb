@@ -18,6 +18,12 @@ describe OStruct::Sanitizer do
   end
 
   describe "#truncate" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      truncate :first_name, :last_name, length: 10
+      truncate :middle_name, length: 3, strip_whitespaces: false
+    end
+
     let(:user) do
       User.new(
         first_name: " first name longer than 10 characters",
@@ -46,6 +52,11 @@ describe OStruct::Sanitizer do
   end
 
   describe "#drop_punctuation" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      drop_punctuation :city, :country
+    end
+
     let(:user) do
       User.new(
         city: "Porto, Alegre!",
@@ -69,6 +80,11 @@ describe OStruct::Sanitizer do
   end
 
   describe "#strip" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      strip :email, :phone
+    end
+
     let(:user) do
       User.new(
         email: "  drborges.cic@gmail.com   ",
@@ -92,6 +108,11 @@ describe OStruct::Sanitizer do
   end
 
   describe "#digits" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      digits :ssn, :cell_phone
+    end
+
     let(:user) do
       User.new(
         ssn: "111-11-1111",
@@ -111,6 +132,31 @@ describe OStruct::Sanitizer do
       user = User.new ssn: nil, cell_phone: nil
       expect(user.ssn).to be nil
       expect(user.cell_phone).to be nil
+    end
+  end
+
+  describe "#default" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      default :active, to: true
+    end
+
+    context "with default value" do
+
+      context "user.active is nil" do
+        let(:user) { User.new active: nil }
+        it { expect(user.active).to be true }
+      end
+
+      context "active user" do
+        let(:user) { User.new active: true }
+        it { expect(user.active).to be true }
+      end
+
+      context "inactive user" do
+        let(:user) { User.new active: false }
+        it { expect(user.active).to be false }
+      end
     end
   end
 end
