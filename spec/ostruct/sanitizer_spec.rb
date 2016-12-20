@@ -22,17 +22,20 @@ describe OStruct::Sanitizer do
       User.new(
         first_name: "first name longer than 10 characters",
         last_name: "last name longer than 10 characters",
+        middle_name: "Rose ",
       )
     end
 
     it "truncates user's first name to 10 characters" do
-      expect(user.first_name.length).to be 10
       expect(user.first_name).to eq "first name"
     end
 
     it "truncates user's last name to 10 characters" do
-      expect(user.last_name.length).to be 10
-      expect(user.last_name).to eq "last name "
+      expect(user.last_name).to eq "last name"
+    end
+
+    it "truncates user's middle name without stipping whitespaces" do
+      expect(user.middle_name).to eq "Rose "
     end
 
     it "does not sanitize if value is nil" do
