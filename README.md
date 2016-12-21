@@ -34,7 +34,7 @@ class User < OpenStruct
   include OStruct::Sanitizer
 
   truncate :first_name, :last_name, length: 10
-  drop_punctuation :city, :country
+  alphanumeric :city, :country
   strip :email, :phone
 
   sanitize :age do |value|

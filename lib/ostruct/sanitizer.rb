@@ -10,7 +10,7 @@ module OStruct
   #     include WellsFargoRetail::Sanitizer
   #
   #     truncate :name, length: 20
-  #     drop_punctuation :name
+  #     alphanumeric :name
   #     sanitize :middle_name do |value|
   #       # Perform a more complex sanitization process
   #     end
@@ -94,12 +94,12 @@ module OStruct
         strip(*fields) if strip_whitespaces
       end
 
-      # Drops any punctuation character from the field's value
+      # Remove any non-alphanumeric character from the field's value
       #
       # @param [Array<Symbol>] a list of field names to be sanitized
       #
-      def drop_punctuation(*fields)
-        sanitize(*fields) { |value| value.gsub(/[^\w\s]/, '') }
+      def alphanumeric(*fields)
+        sanitize(*fields) { |value| value.gsub(/[^A-Za-z0-9\s]/, '') }
       end
 
       # Strips out leading and trailing spaces from the values of the given fields

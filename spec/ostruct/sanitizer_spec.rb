@@ -18,6 +18,12 @@ describe OStruct::Sanitizer do
   end
 
   describe "#truncate" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      truncate :first_name, :last_name, length: 10
+      truncate :middle_name, length: 3, strip_whitespaces: false
+    end
+
     let(:user) do
       User.new(
         first_name: " first name longer than 10 characters",
@@ -45,11 +51,16 @@ describe OStruct::Sanitizer do
     end
   end
 
-  describe "#drop_punctuation" do
+  describe "#alphanumeric" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      alphanumeric :city, :country
+    end
+
     let(:user) do
       User.new(
         city: "Porto, Alegre!",
-        country: "B.r!a,z#i%l^",
+        country: "B.r!_a,z#i%l^",
       )
     end
 
@@ -69,6 +80,11 @@ describe OStruct::Sanitizer do
   end
 
   describe "#strip" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      strip :email, :phone
+    end
+
     let(:user) do
       User.new(
         email: "  drborges.cic@gmail.com   ",
@@ -92,6 +108,11 @@ describe OStruct::Sanitizer do
   end
 
   describe "#digits" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      digits :ssn, :cell_phone
+    end
+
     let(:user) do
       User.new(
         ssn: "111-11-1111",
