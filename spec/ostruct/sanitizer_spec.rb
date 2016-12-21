@@ -45,11 +45,11 @@ describe OStruct::Sanitizer do
     end
   end
 
-  describe "#drop_punctuation" do
+  describe "#alphanumeric" do
     let(:user) do
       User.new(
         city: "Porto, Alegre!",
-        country: "B.r!a,z#i%l^",
+        country: "B.r!_a,z#i%l^",
       )
     end
 
