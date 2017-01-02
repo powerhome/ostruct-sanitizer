@@ -134,4 +134,32 @@ describe OStruct::Sanitizer do
       expect(user.cell_phone).to be nil
     end
   end
+
+  describe "#sanitize" do
+    class User < OpenStruct
+      include OStruct::Sanitizer
+      sanitize "my ssn" do |value|
+        value.to_s.gsub(/[^0-9]/, '')
+      end
+    end
+
+    context "hash syntax" do
+      it "applies sanitization rules using string as key" do
+        user = User.new
+        user["my ssn"] = "111-11-1111"
+        expect(user["my ssn"]).to eq "111111111"
+      end
+
+      it "applies sanitization rules using symbol as key" do
+        user = User.new
+        user[:"my ssn"] = "111-11-1111"
+        expect(user["my ssn"]).to eq "111111111"
+      end
+
+      it "applies sanitization rules using string as key in the constructor" do
+        user = User.new "my ssn" => "111-11-1111"
+        expect(user[:"my ssn"]).to eq "111111111"
+      end
+    end
+  end
 end

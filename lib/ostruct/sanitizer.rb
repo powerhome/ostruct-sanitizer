@@ -7,7 +7,7 @@ module OStruct
   #
   # @example
   #   class Person < OpenStruct
-  #     include WellsFargoRetail::Sanitizer
+  #     include OStruct::Sanitizer
   #
   #     truncate :name, length: 20
   #     alphanumeric :name
@@ -30,7 +30,7 @@ module OStruct
     def initialize(attrs = {})
       super
       attrs.each_pair do |field, value|
-        send("#{field}=", value)
+        self[field] = value
       end
     end
 
@@ -41,7 +41,10 @@ module OStruct
     # @param [Array<Any>] args the method's arguments list
     #
     def method_missing(method, *args)
+      # Give OpenStruct a chance to create getters and setters for the
+      # corresponding field
       super method, *args
+
       if field = setter?(method)
         # override setter logic to apply any existing sanitization rules before
         # assigning the new value to the field
@@ -50,6 +53,16 @@ module OStruct
         # existing sanitization rules
         send(method, args[0])
       end
+    end
+
+    # Set attribute's value via setter so that any existing sanitization rules
+    # may be applied
+    #
+    # @param [Symbol|String] name the attribute's name
+    # @param [Any] value the attribute's value
+    #
+    def []=(name, value)
+      send("#{name}=", value)
     end
 
     private
@@ -89,7 +102,7 @@ module OStruct
       def sanitize(*fields, &block)
         @sanitizers ||= {}
         fields.each do |field|
-          field_sanitizers = @sanitizers[field] ||= []
+          field_sanitizers = @sanitizers[field.to_sym] ||= []
           field_sanitizers << block
         end
       end
