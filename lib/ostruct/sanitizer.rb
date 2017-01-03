@@ -28,7 +28,7 @@ module OStruct
     # Initializes the OpenStruct applying any registered sanitization rules
     #
     def initialize(attrs = {})
-      super
+      super nil
       attrs.each_pair do |field, value|
         self[field] = value
       end
