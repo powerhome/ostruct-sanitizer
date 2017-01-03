@@ -7,7 +7,7 @@ module OStruct
   #
   # @example
   #   class Person < OpenStruct
-  #     include WellsFargoRetail::Sanitizer
+  #     include OStruct::Sanitizer
   #
   #     truncate :name, length: 20
   #     alphanumeric :name
@@ -28,32 +28,57 @@ module OStruct
     # Initializes the OpenStruct applying any registered sanitization rules
     #
     def initialize(attrs = {})
-      super
+      super nil
       attrs.each_pair do |field, value|
-        self.send("#{field}=", value)
+        self[field] = value
       end
     end
 
-    # Overrides ostruct member definition applying sanitization rules when needed
+    # Creates a setter method for the corresponding field which applies any
+    # existing sanitization rules
     #
-    # @param [#to_sym] field the name of the field being defined
-    # @return [Symbol] the name of the defined field
+    # @param [Symbol] method the missing method
+    # @param [Array<Any>] args the method's arguments list
     #
-    def new_ostruct_member(field)
-      field = field.to_sym
-      unless respond_to?(field)
-        define_singleton_method(field) { modifiable[field] }
-        define_singleton_method("#{field}=") do |value|
-          modifiable[field] = sanitize(field, value)
-        end
+    def method_missing(method, *args)
+      # Give OpenStruct a chance to create getters and setters for the
+      # corresponding field
+      super method, *args
+
+      if field = setter?(method)
+        # override setter logic to apply any existing sanitization rules before
+        # assigning the new value to the field
+        override_setter_for(field) if sanitize?(field)
+        # uses the newly created setter to set the field's value and apply any
+        # existing sanitization rules
+        send(method, args[0])
       end
-      field
+    end
+
+    # Set attribute's value via setter so that any existing sanitization rules
+    # may be applied
+    #
+    # @param [Symbol|String] name the attribute's name
+    # @param [Any] value the attribute's value
+    #
+    def []=(name, value)
+      send("#{name}=", value)
     end
 
     private
 
+    def setter?(method)
+      method[/.*(?==\z)/m].to_s.to_sym
+    end
+
+    def override_setter_for(field)
+      define_singleton_method("#{field}=") do |value|
+        modifiable[field] = sanitize(field, value)
+      end
+    end
+
     def sanitize(field, value)
-      return value if value.nil? || !sanitize?(field)
+      return value if value.nil?
       self.class.sanitizers[field].reduce(value) do |current_value, sanitizer|
         sanitizer.call(current_value)
       end
@@ -77,7 +102,7 @@ module OStruct
       def sanitize(*fields, &block)
         @sanitizers ||= {}
         fields.each do |field|
-          field_sanitizers = @sanitizers[field] ||= []
+          field_sanitizers = @sanitizers[field.to_sym] ||= []
           field_sanitizers << block
         end
       end
