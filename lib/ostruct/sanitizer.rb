@@ -73,7 +73,7 @@ module OStruct
 
     def override_setter_for(field)
       define_singleton_method("#{field}=") do |value|
-        modifiable?[field] = sanitize(field, value)
+        @table[field] = sanitize(field, value)
       end
     end
 
